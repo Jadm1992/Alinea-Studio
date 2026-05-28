@@ -1,0 +1,243 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "ComicShannsMono Nerd Font", "ComicShannsMonoNerd", "Comic Shanns Mono Nerd Font", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "ComicShannsMono Nerd Font", "ComicShannsMonoNerd", "Comic Shanns Mono Nerd Font", "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-emerald-300: var(--theme-highlight);
+  --color-emerald-400: var(--theme-highlight);
+  --color-emerald-500: var(--theme-secondary);
+  --color-emerald-900: var(--theme-border);
+  --color-emerald-950: var(--theme-surface);
+
+  --color-zinc-50: var(--theme-text-primary);
+  --color-zinc-100: var(--theme-text-primary);
+  --color-zinc-200: var(--theme-text-primary);
+  --color-zinc-300: var(--theme-text-primary);
+  --color-zinc-400: var(--theme-text-muted);
+  --color-zinc-500: var(--theme-text-muted);
+  --color-zinc-600: var(--theme-text-muted);
+  --color-zinc-650: var(--theme-text-muted);
+  --color-zinc-700: var(--theme-border);
+  --color-zinc-800: var(--theme-border);
+  --color-zinc-850: var(--theme-surface-hover);
+  --color-zinc-900: var(--theme-surface);
+  --color-zinc-950: var(--theme-bg);
+
+  --color-white: var(--theme-text-primary);
+  --color-black: var(--theme-bg);
+}
+
+/* Custom Code highlighting styles for Prism Dark Mode Theme */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #71717a; /* zinc-500 */
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: #a1a1aa; /* zinc-400 */
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #f97316; /* orange-500 */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #FEEC8F; /* pastel yellow */
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #A3DDF2; /* pastel blue */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #F8BBD0; /* pastel pink */
+  font-weight: 500;
+}
+
+.token.function,
+.token.class-name {
+  color: #C1E1C1; /* soft mint */
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #D1C4E9; /* pastel purple */
+}
+
+/* Custom Scrollbar Styles for elegant dark visual layout */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--theme-bg, #18181b);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-surface-hover, #3f3f46);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-border, #52525b);
+}
+
+/* Base style resets */
+body {
+  background-color: var(--theme-bg, #09090b);
+  color: var(--theme-text-primary, #f4f4f5);
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Alinea Studio Premium Visual Themes */
+.theme-velvet-rose {
+  --theme-bg: #0E0A0C;
+  --theme-accent: #D98BA4;
+  --theme-secondary: #D98BA4;
+  --theme-highlight: #D98BA4;
+  --theme-text-primary: #F0E6EA;
+  --theme-text-muted: #85737A;
+  --theme-surface: #171114;
+  --theme-surface-hover: #21181D;
+  --theme-border: transparent; /* Use a subtle shadow instead for most borders, or exactly background for seamless look */
+  --theme-bubble-ai: #171114;
+  --theme-bubble-user: #3B222D;
+  --theme-code-bg: #050505;
+  --theme-gradient-start: #D98BA4;
+  --theme-gradient-end: #F0E6EA;
+}
+
+.theme-midnight-lilac {
+  --theme-bg: #0A0910;
+  --theme-accent: #A682FF;
+  --theme-secondary: #A682FF;
+  --theme-highlight: #A682FF;
+  --theme-text-primary: #E8E6F2;
+  --theme-text-muted: #706B85;
+  --theme-surface: #12101C;
+  --theme-surface-hover: #1A1729;
+  --theme-border: transparent;
+  --theme-bubble-ai: #12101C;
+  --theme-bubble-user: #2C254A;
+  --theme-code-bg: #050505;
+  --theme-gradient-start: #A682FF;
+  --theme-gradient-end: #E8E6F2;
+}
+
+.theme-obsidian-gold {
+  --theme-bg: #121111;
+  --theme-accent: #E3B5A4;
+  --theme-secondary: #E3B5A4;
+  --theme-highlight: #E3B5A4;
+  --theme-text-primary: #F2EFE9;
+  --theme-text-muted: #807A78;
+  --theme-surface: #1A1818;
+  --theme-surface-hover: #262222;
+  --theme-border: transparent;
+  --theme-bubble-ai: #1A1818;
+  --theme-bubble-user: #332B29;
+  --theme-code-bg: #000000;
+  --theme-gradient-start: #E3B5A4;
+  --theme-gradient-end: #F2EFE9;
+}
+
+.theme-peach-glow {
+  --theme-bg: #150E0C;
+  --theme-accent: #FF9E79;
+  --theme-secondary: #FF9E79;
+  --theme-highlight: #FF9E79;
+  --theme-text-primary: #F5EAE6;
+  --theme-text-muted: #8A726C;
+  --theme-surface: #1E1512;
+  --theme-surface-hover: #291D19;
+  --theme-border: transparent;
+  --theme-bubble-ai: #1E1512;
+  --theme-bubble-user: #45241C;
+  --theme-code-bg: #050404;
+  --theme-gradient-start: #FF9E79;
+  --theme-gradient-end: #F5EAE6;
+}
+
+.theme-pixie-glitter {
+  --theme-bg: #c86fc9;
+  --theme-accent: #a144a4;
+  --theme-secondary: #c86fc9;
+  --theme-highlight: #4c114e;
+  --theme-text-primary: #3d0a3f;
+  --theme-text-muted: #75347a;
+  --theme-surface: rgba(255, 255, 255, 0.45);
+  --theme-surface-hover: rgba(255, 255, 255, 0.65);
+  --theme-border: rgba(255, 255, 255, 0.45);
+  --theme-bubble-ai: rgba(255, 255, 255, 0.6);
+  --theme-bubble-user: #4c114e;               /* Rich, standalone dark purple-magenta bubble preventing background blending */
+  --theme-bubble-user-text: #ffffff;          /* Extremely readable bright white text */
+  --theme-code-bg: rgba(61, 10, 63, 0.08);
+  --theme-gradient-start: #c86fc9;
+  --theme-gradient-end: #f79ad3;
+}
+
+/* Elegant smooth transitions when switching themes */
+.theme-velvet-rose, .theme-midnight-lilac, .theme-obsidian-gold, .theme-peach-glow, .theme-pixie-glitter {
+  transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1), background-image 0.6s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease !important;
+}
+
+/* Beautiful custom moving linear gradient using user-requested colors */
+.theme-pixie-glitter, 
+[class*="theme-pixie-glitter"] {
+  background-color: #c86fc9 !important;
+  background-image: linear-gradient(316deg, #c86fc9 0%, #f79ad3 45%, #c86fc9 75%, #f79ad3 120%) !important;
+  background-size: 300% 300% !important;
+  animation: pixie-gradient-motion 14s ease infinite !important;
+}
+
+@keyframes pixie-gradient-motion {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Make sure container states respect the animated layout background of the selected theme */
+.theme-pixie-glitter .bg-\[var\(--theme-bg\)\],
+.theme-pixie-glitter [style*="background-color: var(--theme-bg)"] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Custom glow utility */
+.glowing-gradient-text {
+  background: linear-gradient(135deg, var(--theme-gradient-start, #10b981), var(--theme-gradient-end, #3b82f6));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
