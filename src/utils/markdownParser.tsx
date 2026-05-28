@@ -163,6 +163,7 @@ export const TextBlockRenderer: React.FC<TextBlockRendererProps> = ({ content })
       <ReactMarkdown 
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
+        urlTransform={(value) => value}
         components={{
           h1: ({node, ...props}) => <h1 className="font-bold text-2xl mt-4 mb-2 tracking-tight" {...props} />,
           h2: ({node, ...props}) => <h2 className="font-semibold text-xl mt-4 mb-2 tracking-tight border-b border-[var(--theme-border)] pb-1" {...props} />,

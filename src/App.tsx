@@ -302,6 +302,7 @@ export default function App() {
   const [selectedModel, setSelectedModel] = useState('azure/ai');
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isImageMode, setIsImageMode] = useState(false);
   const [errorBanner, setErrorBanner] = useState<string | null>(null);
   const [currentQuote, setCurrentQuote] = useState<{text: string, author: string} | null>(null);
 
@@ -696,6 +697,41 @@ export default function App() {
     let accumulatedText = '';
 
     try {
+      if (isImageMode || promptToSend.toLowerCase().startsWith('/imagine ')) {
+        let imagePrompt = promptToSend;
+        if (promptToSend.toLowerCase().startsWith('/imagine ')) {
+          imagePrompt = promptToSend.substring(9).trim();
+        }
+        const response = await fetch('/api/generate-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: imagePrompt })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Image generation failed.');
+        }
+        
+        const data = await response.json();
+        const aiMessage: Message = {
+          id: `msg-${Date.now()}-${uniqueSuffix}-ai`,
+          role: 'ai',
+          text: `![Generated Image](${data.imageUrl})`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        
+        setSessions(prev => prev.map(s => 
+          s.id === activeSession.id
+            ? { ...s, messages: [...s.messages, aiMessage] }
+            : s
+        ));
+        
+        setIsStreaming(false);
+        setTimeout(() => scrollToBottom(), 50);
+        return;
+      }
+
       const response = await fetch('/api/chat/stream', {
         method: 'POST',
         headers: {
@@ -1212,6 +1248,19 @@ export default function App() {
                 )}
 
                 <div className="flex items-start w-full gap-2">
+                  {/* Image Mode Toggle */}
+                  <button
+                    onClick={() => setIsImageMode(!isImageMode)}
+                    title={isImageMode ? "Switch to Text Mode" : "Switch to Image Generation Mode"}
+                    className={`p-2 mt-0.5 rounded-lg transition flex-shrink-0 cursor-pointer ${
+                      isImageMode 
+                        ? 'text-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20' 
+                        : 'text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:bg-[var(--theme-surface-hover)]'
+                    }`}
+                  >
+                    <Palette className="w-4 h-4" />
+                  </button>
+
                   {/* Media picker button trigger */}
                   <label className="p-2 mt-0.5 text-[var(--theme-text-muted)] hover:text-[var(--theme-text-primary)] hover:bg-[var(--theme-surface-hover)] rounded-lg transition cursor-pointer flex-shrink-0" title="Attach/Browse Images">
                     <Paperclip className="w-4 h-4" />
@@ -1246,7 +1295,7 @@ export default function App() {
                     }}
                     onPaste={handlePaste}
                     rows={1}
-                    placeholder="Ask Alinea"
+                    placeholder={isImageMode ? "Describe an image to generate..." : "Ask Alinea"}
                     className="flex-1 bg-transparent border-none placeholder:text-[var(--theme-text-muted)] text-[var(--theme-text-primary)] text-sm py-1.5 focus:outline-none resize-none leading-relaxed font-sans"
                     style={{ height: 'auto', maxHeight: '180px' }}
                   />
