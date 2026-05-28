@@ -5,12 +5,14 @@ import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 import fs from "fs/promises";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 import { EdgeTTS } from "node-edge-tts";
 import os from "os";
 
 dotenv.config();
 
 const app = express();
+app.use(helmet());
 app.set('trust proxy', 1);
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -321,7 +323,8 @@ app.post("/api/chat", async (req, res) => {
     }
   } catch (err: any) {
     console.error("Error in /api/chat:", err);
-    res.status(500).json({ error: err.message || "Internal Server Error" });
+    const msg = err.message && err.message.includes("is not configured") ? err.message : "An error occurred while processing your request.";
+    res.status(500).json({ error: msg });
   }
 });
 
@@ -432,7 +435,9 @@ app.post("/api/chat/stream", async (req, res) => {
     });
 
     if (!response.ok) {
-      res.write(`data: ${JSON.stringify({ error: `${provider.toUpperCase()} stream error (${response.status}): ${await response.text()}` })}\n\n`);
+      const errorText = await response.text();
+      console.error(`${provider.toUpperCase()} stream error (${response.status}): ${errorText}`);
+      res.write(`data: ${JSON.stringify({ error: "An error occurred with the upstream provider." })}\n\n`);
       res.end();
       return;
     }
@@ -487,7 +492,8 @@ app.post("/api/chat/stream", async (req, res) => {
   } catch (err: any) {
     console.error("Error in /api/chat/stream:", err);
     if (!res.headersSent) res.writeHead(500, { "Content-Type": "text/event-stream" });
-    res.write(`data: ${JSON.stringify({ error: err.message || "Streaming error" })}\n\n`);
+    const msg = err.message && err.message.includes("is not configured") ? err.message : "An error occurred while streaming your request.";
+    res.write(`data: ${JSON.stringify({ error: msg })}\n\n`);
     res.end();
   }
 });
@@ -508,7 +514,7 @@ app.post("/api/tts", async (req, res) => {
     res.send(audioBuffer);
   } catch (err: any) {
     console.error("Error in /api/tts:", err);
-    res.status(500).json({ error: err.message || "Internal Server Error communicating with TTS" });
+    res.status(500).json({ error: "Internal Server Error communicating with TTS" });
   }
 });
 
@@ -548,7 +554,7 @@ app.post("/api/generate-image", async (req, res) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Azure Image Gen Error:", errorText);
-      return res.status(response.status).json({ error: `Azure error: ${response.statusText}` });
+      return res.status(response.status).json({ error: "An error occurred during image generation." });
     }
 
     const data = await response.json();
@@ -573,7 +579,7 @@ app.post("/api/generate-image", async (req, res) => {
 
   } catch (err: any) {
     console.error("Error in /api/generate-image:", err);
-    res.status(500).json({ error: err.message || "Internal Server Error during image generation" });
+    res.status(500).json({ error: "Internal Server Error during image generation" });
   }
 });
 
