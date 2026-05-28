@@ -708,18 +708,23 @@ export default function App() {
           body: JSON.stringify({ prompt: imagePrompt })
         });
         
+        let aiMessage: Message;
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error || 'Image generation failed.');
+          aiMessage = {
+            id: `msg-${Date.now()}-${uniqueSuffix}-ai`,
+            role: 'ai',
+            text: `Due to safety filters or an internal error, I cannot generate an image for this prompt.`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+        } else {
+          const data = await response.json();
+          aiMessage = {
+            id: `msg-${Date.now()}-${uniqueSuffix}-ai`,
+            role: 'ai',
+            text: `![Generated Image](${data.imageUrl})`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
         }
-        
-        const data = await response.json();
-        const aiMessage: Message = {
-          id: `msg-${Date.now()}-${uniqueSuffix}-ai`,
-          role: 'ai',
-          text: `![Generated Image](${data.imageUrl})`,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
         
         setSessions(prev => prev.map(s => 
           s.id === activeSession.id
