@@ -12,7 +12,18 @@ import os from "os";
 dotenv.config();
 
 const app = express();
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      "connect-src": ["'self'", "ws:", "wss:", "https:"],
+      "media-src": ["'self'", "blob:"],
+      "img-src": ["'self'", "data:", "blob:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
 app.set('trust proxy', 1);
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
