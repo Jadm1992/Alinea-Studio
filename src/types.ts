@@ -1,6 +1,6 @@
 export interface Message {
   id: string;
-  role: 'user' | 'model';
+  role: 'user' | 'assistant';
   text: string;
   timestamp: string;
   images?: string[];

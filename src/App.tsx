@@ -635,7 +635,7 @@ export default function App() {
       if (activeSession && streamingText.trim()) {
         const fullStreamingMessage: Message = {
           id: `msg-${Date.now()}-partial`,
-          role: 'model',
+          role: 'assistant',
           text: streamingText,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           modelUsed: activeSession.model || selectedModel
@@ -712,7 +712,7 @@ export default function App() {
         if (!response.ok) {
           aiMessage = {
             id: `msg-${Date.now()}-${uniqueSuffix}-ai`,
-            role: 'ai',
+            role: 'assistant',
             text: `Due to safety filters or an internal error, I cannot generate an image for this prompt.`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           };
@@ -720,7 +720,7 @@ export default function App() {
           const data = await response.json();
           aiMessage = {
             id: `msg-${Date.now()}-${uniqueSuffix}-ai`,
-            role: 'ai',
+            role: 'assistant',
             text: `![Generated Image](${data.imageUrl})`,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           };
@@ -805,7 +805,7 @@ export default function App() {
 
       const assistantMessage: Message = {
         id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 10)}-assistant`,
-        role: 'model',
+        role: 'assistant',
         text: accumulatedText || 'Could not fetch a valid model response. Check your API configurations.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         modelUsed: activeSession.model || selectedModel
@@ -834,7 +834,7 @@ export default function App() {
         if (accumulatedText.trim().length > 0) {
           const assistantMessage: Message = {
             id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 10)}-assistant-salvaged`,
-            role: 'model',
+            role: 'assistant',
             text: accumulatedText,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             modelUsed: activeSession.model || selectedModel
