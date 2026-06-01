@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import localforage from 'localforage';
-import { ChatSession, Message, CodeSnippet, ModelOption } from './types';
+import { ChatSession, Message, ModelOption } from './types';
 import { ChatSidebar } from './components/ChatSidebar';
 import { ModelSelector, modelOptions } from './components/ModelSelector';
 import { SystemInstructionModal } from './components/SystemInstructionModal';
@@ -13,23 +13,13 @@ import {
   Settings2, 
   Menu, 
   Sparkles, 
-  Trash2, 
-  Compass, 
   Volume2, 
   VolumeX,
-  Search, 
   X, 
   StopCircle, 
-  ChevronRight,
-  Code,
   AlertTriangle,
-  Github,
-  HelpCircle,
-  FolderCode,
   Paperclip,
-  Image as ImageIcon,
   Check,
-  Copy,
   Clipboard,
   Palette,
   Plus
@@ -40,7 +30,6 @@ const INITIAL_TEMPERATURE = 0.7;
 
 const MessageBubble = React.memo(({ 
   message, 
-  searchQuery,
   getModelFriendlyName,
   speakingMessageId,
   handleToggleSpeak,
@@ -48,7 +37,6 @@ const MessageBubble = React.memo(({
   handleCopyMessage
 }: {
   message: Message,
-  searchQuery: string,
   getModelFriendlyName: (id?: string) => string,
   speakingMessageId: string | null,
   handleToggleSpeak: (id: string, text: string) => void,
@@ -56,10 +44,6 @@ const MessageBubble = React.memo(({
   handleCopyMessage: (text: string, id: string) => void
 }) => {
   const isUser = message.role === 'user';
-  
-  if (searchQuery && message.text && !message.text.toLowerCase().includes(searchQuery.toLowerCase())) {
-    return null;
-  }
 
   return (
     <div
@@ -298,7 +282,7 @@ export default function App() {
   const [userInput, setUserInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+
   const [selectedModel, setSelectedModel] = useState('azure/ai');
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -935,31 +919,6 @@ export default function App() {
     };
   }, []);
 
-  // Filter messages list in dynamic searching
-  const filteredMessages = activeSession
-    ? activeSession.messages.filter((msg) =>
-        msg.text.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
-
-  const presetSuggestionStarters = [
-    {
-      title: 'Debounce JavaScript Event',
-      prompt: 'Write a robust TypeScript helper utility for debouncing browser event triggers with leading/trailing configuration options.'
-    },
-    {
-      title: 'Centering Centered Div',
-      prompt: 'Explain and provide multiple methods (Flexbox, CSS Grid, Absolute margins) to center a box elements horizontally and vertically using Tailwind CSS.'
-    },
-    {
-      title: 'CRUD Stock Ticker API',
-      prompt: 'Design an Express middleware stack that integrates JWT validation with strict schemas checking.'
-    },
-    {
-      title: 'Rust Match Pattern',
-      prompt: 'Explain pattern matching guards in Rust using rich structures. Provide code snippets.'
-    }
-  ];
 
   if (!isAppLoaded) {
     return <div className={`h-screen w-screen theme-${theme} transition-colors duration-300`} style={{ backgroundColor: 'var(--theme-bg)' }} />;
@@ -1142,7 +1101,7 @@ export default function App() {
               <MessageBubble
                 key={message.id}
                 message={message}
-                searchQuery={searchQuery}
+
                 getModelFriendlyName={getModelFriendlyName}
                 speakingMessageId={speakingMessageId}
                 handleToggleSpeak={handleToggleSpeak}
@@ -1340,7 +1299,7 @@ export default function App() {
 
         </main>
 
-        {/* Right Side code workspace completely removed for simplified layout */}
+
       </div>
 
       {/* Model configuration settings panel modal */}

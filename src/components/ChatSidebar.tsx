@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChatSession } from '../types';
-import { MessageSquare, Plus, Trash2, Edit3, Check, X, Code, Sparkles, MessageSquareCode } from 'lucide-react';
+import { MessageSquare, Plus, Trash2, Edit3, Check, X, MessageSquareCode } from 'lucide-react';
 
 interface ChatSidebarProps {
   sessions: ChatSession[];

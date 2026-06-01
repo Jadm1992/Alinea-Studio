@@ -75,79 +75,7 @@ export function parseMarkdownBlocks(text: string): MarkdownBlockItem[] {
   return blocks;
 }
 
-/**
- * Parses inline formatting tags: **bold**, *italic*, and `inline code`
- * and maps them directly to inline React elements.
- */
-export function parseInlineText(text: string): React.ReactNode[] {
-  const parts: React.ReactNode[] = [];
-  let index = 0;
 
-  while (index < text.length) {
-    const boldIdx = text.indexOf('**', index);
-    const codeIdx = text.indexOf('`', index);
-    const italicIdx = text.indexOf('*', index);
-
-    const indices = [
-      { type: 'bold', pos: boldIdx },
-      { type: 'code', pos: codeIdx },
-      { type: 'italic', pos: italicIdx }
-    ].filter(x => x.pos !== -1).sort((a, b) => a.pos - b.pos);
-
-    if (indices.length === 0) {
-      parts.push(text.substring(index));
-      break;
-    }
-
-    const closest = indices[0];
-    if (closest.pos > index) {
-      parts.push(text.substring(index, closest.pos));
-    }
-
-    if (closest.type === 'bold') {
-      const endBold = text.indexOf('**', closest.pos + 2);
-      if (endBold !== -1) {
-        parts.push(
-          <strong key={`bold-${closest.pos}`} className="font-semibold text-emerald-400">
-            {text.substring(closest.pos + 2, endBold)}
-          </strong>
-        );
-        index = endBold + 2;
-      } else {
-        parts.push('**');
-        index = closest.pos + 2;
-      }
-    } else if (closest.type === 'code') {
-      const endCode = text.indexOf('`', closest.pos + 1);
-      if (endCode !== -1) {
-        parts.push(
-          <code key={`code-${closest.pos}`} className="px-1.5 py-0.5 rounded bg-[var(--theme-border)] text-rose-400 font-mono text-xs select-all">
-            {text.substring(closest.pos + 1, endCode)}
-          </code>
-        );
-        index = endCode + 1;
-      } else {
-        parts.push('`');
-        index = closest.pos + 1;
-      }
-    } else { // italic
-      const endItalic = text.indexOf('*', closest.pos + 1);
-      if (endItalic !== -1) {
-        parts.push(
-          <em key={`ital-${closest.pos}`} className="italic text-[var(--theme-text-primary)]">
-            {text.substring(closest.pos + 1, endItalic)}
-          </em>
-        );
-        index = endItalic + 1;
-      } else {
-        parts.push('*');
-        index = closest.pos + 1;
-      }
-    }
-  }
-
-  return parts;
-}
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

@@ -173,12 +173,6 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
     let finalId = newModelId.trim();
     if (newModelProvider === 'openrouter' && !finalId.startsWith('openrouter/')) {
       finalId = `openrouter/${finalId}`;
-    } else if (newModelProvider === 'openai' && !finalId.startsWith('gpt-')) {
-      // optional padding
-    } else if (newModelProvider === 'anthropic' && !finalId.startsWith('claude-')) {
-      // optional padding
-    } else if (newModelProvider === 'deepseek' && !finalId.startsWith('deepseek-')) {
-      // optional padding
     } else if (newModelProvider === 'azure' && !finalId.startsWith('azure/')) {
       finalId = `azure/${finalId}`;
     }
