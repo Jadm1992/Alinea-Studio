@@ -351,7 +351,7 @@ export default function App() {
   };
 
   const { pendingImages, setPendingImages, handleAddImages, handlePaste, removePendingImage } = useImageAttachments();
-  const { speakingMessageId, handleToggleSpeak } = useTTS();
+  const { speakingMessageId, setSpeakingMessageId, handleToggleSpeak } = useTTS();
 
 
 

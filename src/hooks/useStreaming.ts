@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Message, ChatSession } from '../types';
-import { getTimestamp, generateMessageId } from '../utils/formatters';
+import { getTimestamp, generateMessageId } from '../utils/helpers';
 
 interface UseStreamingProps {
   activeSession: ChatSession | undefined;

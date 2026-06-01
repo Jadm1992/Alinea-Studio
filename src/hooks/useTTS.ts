@@ -76,5 +76,5 @@ export function useTTS() {
     };
   }, []);
 
-  return { speakingMessageId, handleToggleSpeak };
+  return { speakingMessageId, setSpeakingMessageId, handleToggleSpeak };
 }
