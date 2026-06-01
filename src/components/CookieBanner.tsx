@@ -7,36 +7,33 @@ import { isEuropeanUser } from '../utils/geolocation';
 export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
+  const setConsentCookie = (value: string) => {
+    const expirationDate = new Date();
+    expirationDate.setFullYear(expirationDate.getFullYear() + 1); 
+    document.cookie = `cookie_consent=${value}; expires=${expirationDate.toUTCString()}; path=/`;
+    localStorage.setItem('alinea_cookie_consent', value);
+  };
+
   useEffect(() => {
     const cookieConsent = document.cookie
       .split('; ')
       .find((row) => row.startsWith('cookie_consent='));
 
     if (cookieConsent) {
-      // Re-sync back to local storage just in case they cleared local storage but kept the cookie
-      localStorage.setItem('alinea_cookie_consent', 'accepted');
-      enableTracking();
-      trackEvent('cookie_consent', 'System', 'Accepted (Persistent)');
+      const val = cookieConsent.split('=')[1];
+      localStorage.setItem('alinea_cookie_consent', val);
+      if (val === 'accepted') enableTracking();
     } else {
       const localStorageConsent = localStorage.getItem('alinea_cookie_consent');
       if (localStorageConsent) {
-        // Re-sync back to cookie since they cleared cookie but kept local storage
-        const expirationDate = new Date();
-        expirationDate.setFullYear(expirationDate.getFullYear() + 100); 
-        document.cookie = `cookie_consent=${localStorageConsent}; expires=${expirationDate.toUTCString()}; path=/`;
-        enableTracking();
-        trackEvent('cookie_consent', 'System', 'Accepted (Persistent)');
+        setConsentCookie(localStorageConsent);
+        if (localStorageConsent === 'accepted') enableTracking();
       } else {
         if (!isEuropeanUser()) {
-          // Non-EU: Maximize data collection immediately, no banner needed
-          const expirationDate = new Date();
-          expirationDate.setFullYear(expirationDate.getFullYear() + 100); 
-          document.cookie = `cookie_consent=accepted; expires=${expirationDate.toUTCString()}; path=/`;
-          localStorage.setItem('alinea_cookie_consent', 'accepted');
+          setConsentCookie('accepted');
           enableTracking();
           trackEvent('cookie_consent', 'System', 'Auto-Accepted (Non-EU)');
         } else {
-          // EU: Show cookie consent banner
           const timer = setTimeout(() => {
             setIsVisible(true);
           }, 1000);
@@ -47,23 +44,16 @@ export default function CookieBanner() {
   }, []);
 
   const handleAccept = () => {
-    const expirationDate = new Date();
-    expirationDate.setFullYear(expirationDate.getFullYear() + 100); 
-    document.cookie = `cookie_consent=accepted; expires=${expirationDate.toUTCString()}; path=/`;
-    localStorage.setItem('alinea_cookie_consent', 'accepted');
+    setConsentCookie('accepted');
     setIsVisible(false);
     enableTracking();
-    trackEvent('cookie_consent', 'System', 'Accepted (Persistent)');
+    trackEvent('cookie_consent', 'System', 'Accepted');
   };
 
   const handleDecline = () => {
-    const expirationDate = new Date();
-    expirationDate.setFullYear(expirationDate.getFullYear() + 100); 
-    document.cookie = `cookie_consent=accepted; expires=${expirationDate.toUTCString()}; path=/`;
-    localStorage.setItem('alinea_cookie_consent', 'accepted');
+    setConsentCookie('declined');
     setIsVisible(false);
-    enableTracking();
-    trackEvent('cookie_consent', 'System', 'Accepted (Persistent)');
+    trackEvent('cookie_consent', 'System', 'Declined');
   };
 
   return (
