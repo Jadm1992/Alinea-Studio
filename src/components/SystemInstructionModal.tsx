@@ -15,7 +15,7 @@ import {
   Info,
   Palette
 } from 'lucide-react';
-import { ModelOption } from '../types';
+import { ModelOption, Provider, PROVIDER_CONFIG } from '../types';
 
 interface SystemInstructionModalProps {
   currentInstruction: string;
@@ -151,7 +151,7 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
   // Form states for adding custom models
   const [newModelId, setNewModelId] = useState('');
   const [newModelName, setNewModelName] = useState('');
-  const [newModelProvider, setNewModelProvider] = useState<'gemini' | 'openrouter' | 'openai' | 'deepseek' | 'anthropic' | 'azure'>('openrouter');
+  const [newModelProvider, setNewModelProvider] = useState<Provider>('openrouter');
   const [newModelDescription, setNewModelDescription] = useState('');
   const [newModelBadge, setNewModelBadge] = useState('Custom');
 
@@ -453,13 +453,7 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
 
                 <div className="space-y-3 bg-[var(--theme-surface-hover)] border border-[var(--theme-border)] p-4 rounded-xl">
                   {/* Providers: Gemini, OpenRouter, OpenAI, DeepSeek, Anthropic */}
-                  {[
-                    { id: 'gemini', label: 'Gemini (Google Key)', placeholder: 'AbCdEf... (Overrides default built-in key)' },
-                    { id: 'openrouter', label: 'OpenRouter API Key', placeholder: 'sk-or-v1-...' },
-                    { id: 'openai', label: 'OpenAI (GPT API Key)', placeholder: 'sk-proj-...' },
-                    { id: 'deepseek', label: 'DeepSeek API Key', placeholder: 'sk-...' },
-                    { id: 'anthropic', label: 'Anthropic Key (Claude)', placeholder: 'sk-ant-...' },
-                  ].map((prov) => {
+                  {PROVIDER_CONFIG.map((prov) => {
                     const isVisible = !!visibleKeys[prov.id];
                     return (
                       <div key={prov.id} className="flex flex-col gap-1.5">
@@ -573,12 +567,7 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
                         onChange={(e: any) => setNewModelProvider(e.target.value)}
                         className="p-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] focus:border-amber-500/50 rounded-lg text-xs outline-none text-[var(--theme-text-primary)] cursor-pointer"
                       >
-                        <option value="gemini">Gemini (Google)</option>
-                        <option value="openrouter">OpenRouter API</option>
-                        <option value="openai">OpenAI (Direct)</option>
-                        <option value="deepseek">DeepSeek (Direct)</option>
-                        <option value="anthropic">Anthropic (Direct)</option>
-                        <option value="azure">Azure AI (Unified)</option>
+                        {PROVIDER_CONFIG.map(p => <option key={p.id} value={p.id}>{p.shortName}</option>)}
                       </select>
                     </div>
 

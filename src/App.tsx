@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import localforage from 'localforage';
 import { ChatSession, Message, ModelOption } from './types';
+import { getTimestamp, generateMessageId } from './utils/helpers';
 import { ChatSidebar } from './components/ChatSidebar';
 import { ModelSelector, modelOptions } from './components/ModelSelector';
 import { SystemInstructionModal } from './components/SystemInstructionModal';
-import { parseMarkdownBlocks, TextBlockRenderer } from './utils/markdownParser';
-import { CodeBlock } from './components/CodeBlock';
+import { RenderedMarkdown } from './components/RenderedMarkdown';
 import CookieBanner from './components/CookieBanner';
 import { enableTracking } from './lib/analytics';
 import { 
@@ -105,21 +105,7 @@ const MessageBubble = React.memo(({
                 <p className="whitespace-pre-wrap leading-relaxed" style={{ color: isUser ? 'var(--theme-bubble-user-text, var(--theme-text-primary))' : 'var(--theme-text-primary)' }}>{message.text}</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {parseMarkdownBlocks(message.text).map((block, idx) => {
-                  if (block.type === 'code') {
-                    return (
-                      <CodeBlock
-                        key={`cb-${idx}`}
-                        code={block.content}
-                        language={block.language || 'javascript'}
-                      />
-                    );
-                  } else {
-                    return <TextBlockRenderer key={`tb-${idx}`} content={block.content} />;
-                  }
-                })}
-              </div>
+              <RenderedMarkdown text={message.text} />
             )}
           </div>
         </div>
@@ -502,6 +488,7 @@ export default function App() {
   }, [sessions, streamingText, isStreaming]);
 
   const activeSession = sessions.find((s) => s.id === activeSessionId);
+  const effectiveModel = activeSession?.model || selectedModel;
 
   const handleAddNewSession = () => {
     fetchRandomQuote();
@@ -621,8 +608,8 @@ export default function App() {
           id: `msg-${Date.now()}-partial`,
           role: 'assistant',
           text: streamingText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          modelUsed: activeSession.model || selectedModel
+          timestamp: getTimestamp(),
+          modelUsed: effectiveModel
         };
         setSessions(
           sessions.map((s) =>
@@ -646,16 +633,16 @@ export default function App() {
     window.speechSynthesis?.cancel();
     setSpeakingMessageId(null);
 
-    const uniqueSuffix = Math.random().toString(36).substring(2, 10);
+
     const imagesToPass = [...pendingImages];
     setPendingImages([]);
 
     const userMessage: Message = {
-      id: `msg-${Date.now()}-${uniqueSuffix}-user`,
+      id: `msg-${generateMessageId()}-user`,
       role: 'user',
       text: promptToSend,
       images: imagesToPass.length > 0 ? imagesToPass : undefined,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: getTimestamp()
     };
 
     let updatedTitle = activeSession.title;
@@ -695,18 +682,18 @@ export default function App() {
         let aiMessage: Message;
         if (!response.ok) {
           aiMessage = {
-            id: `msg-${Date.now()}-${uniqueSuffix}-ai`,
+            id: `msg-${generateMessageId()}-ai`,
             role: 'assistant',
             text: `Due to safety filters or an internal error, I cannot generate an image for this prompt.`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            timestamp: getTimestamp()
           };
         } else {
           const data = await response.json();
           aiMessage = {
-            id: `msg-${Date.now()}-${uniqueSuffix}-ai`,
+            id: `msg-${generateMessageId()}-ai`,
             role: 'assistant',
             text: `![Generated Image](${data.imageUrl})`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            timestamp: getTimestamp()
           };
         }
         
@@ -728,7 +715,7 @@ export default function App() {
         },
         signal: controller.signal,
         body: JSON.stringify({
-          model: activeSession.model || selectedModel,
+          model: effectiveModel,
           message: promptToSend,
           images: imagesToPass,
           history: activeSession.messages.map(({ role, text, images }) => ({ role, text, images })),
@@ -788,11 +775,11 @@ export default function App() {
       }
 
       const assistantMessage: Message = {
-        id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 10)}-assistant`,
+        id: `msg-${generateMessageId()}-assistant`,
         role: 'assistant',
         text: accumulatedText || 'Could not fetch a valid model response. Check your API configurations.',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        modelUsed: activeSession.model || selectedModel
+        timestamp: getTimestamp(),
+        modelUsed: effectiveModel
       };
 
       setSessions((prevSessions) =>
@@ -817,11 +804,11 @@ export default function App() {
         
         if (accumulatedText.trim().length > 0) {
           const assistantMessage: Message = {
-            id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 10)}-assistant-salvaged`,
+            id: `msg-${generateMessageId()}-assistant-salvaged`,
             role: 'assistant',
             text: accumulatedText,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            modelUsed: activeSession.model || selectedModel
+            timestamp: getTimestamp(),
+            modelUsed: effectiveModel
           };
 
           setSessions((prevSessions) =>
@@ -987,7 +974,7 @@ export default function App() {
         <div className="flex items-center gap-2">
           {activeSession && (
             <ModelSelector
-              selectedModel={activeSession.model || selectedModel}
+              selectedModel={effectiveModel}
               onSelectModel={handleSelectModelSetting}
               customModels={customModels}
             />
@@ -1128,20 +1115,8 @@ export default function App() {
                   </div>
 
                   {/* Rendering partially streamed nodes */}
-                  <div className="space-y-4 text-[14px]">
-                    {parseMarkdownBlocks(streamingText).map((block, idx) => {
-                      if (block.type === 'code') {
-                        return (
-                          <CodeBlock
-                            key={`str-cb-${idx}`}
-                            code={block.content}
-                            language={block.language || 'javascript'}
-                          />
-                        );
-                      } else {
-                        return <TextBlockRenderer key={`str-tb-${idx}`} content={block.content} />;
-                      }
-                    })}
+                  <div className="text-[14px]">
+                    <RenderedMarkdown text={streamingText} />
                   </div>
                 </div>
               </div>
@@ -1313,7 +1288,7 @@ export default function App() {
           initialKeys={customKeys}
           initialCustomModels={customModels}
           currentTheme={theme}
-          selectedModelId={activeSession.model || selectedModel}
+          selectedModelId={effectiveModel}
         />
       )}
       

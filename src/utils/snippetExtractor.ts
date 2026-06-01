@@ -1,4 +1,5 @@
 import { CodeSnippet } from '../types';
+import { getExtension } from './fileExtensions';
 
 /**
  * Scans markdown text and automatically registers generated code segments
@@ -34,21 +35,4 @@ export function extractCodeSnippets(text: string, messageId: string): CodeSnippe
   return snippets;
 }
 
-function getExtension(lang: string): string {
-  const table: Record<string, string> = {
-    'typescript': 'ts',
-    'javascript': 'js',
-    'typescriptreact': 'tsx',
-    'javascriptreact': 'jsx',
-    'python': 'py',
-    'bash': 'sh',
-    'rust': 'rs',
-    'go': 'go',
-    'sql': 'sql',
-    'html': 'html',
-    'css': 'css',
-    'json': 'json',
-    'yaml': 'yml',
-  };
-  return table[lang.toLowerCase()] || 'txt';
-}
+

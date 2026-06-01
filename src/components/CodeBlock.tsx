@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { highlightCode } from '../utils/highlighter';
+import { getExtension } from '../utils/fileExtensions';
 import { Clipboard, Check, HardDriveDownload, FolderPlus, ChevronUp, ChevronDown, Code } from 'lucide-react';
 
 interface CodeBlockProps {
@@ -57,24 +58,6 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
     }
   };
 
-  const getExtension = (lang: string): string => {
-    const table: Record<string, string> = {
-      'typescript': 'ts',
-      'javascript': 'js',
-      'typescriptreact': 'tsx',
-      'javascriptreact': 'jsx',
-      'python': 'py',
-      'bash': 'sh',
-      'rust': 'rs',
-      'go': 'go',
-      'sql': 'sql',
-      'html': 'html',
-      'css': 'css',
-      'json': 'json',
-      'yaml': 'yml',
-    };
-    return table[lang.toLowerCase()] || 'txt';
-  };
 
   return (
     <div className="my-4 rounded-xl overflow-hidden shadow-2xl flex flex-col border border-[var(--theme-border)]" style={{ backgroundColor: 'var(--theme-code-bg)' }}>
