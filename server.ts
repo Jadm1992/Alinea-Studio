@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { EdgeTTS } from "node-edge-tts";
 import os from "os";
+import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
@@ -618,7 +619,7 @@ async function setupVite() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  app.listen(Number(PORT), "0.0.0.0", () => {
     console.log(`Express server running on http://localhost:${PORT}`);
   });
 }

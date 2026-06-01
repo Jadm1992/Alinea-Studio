@@ -16,6 +16,7 @@ import {
   Palette
 } from 'lucide-react';
 import { ModelOption, Provider, PROVIDER_CONFIG } from '../types';
+import { appThemes } from '../utils/themeConfig';
 
 interface SystemInstructionModalProps {
   currentInstruction: string;
@@ -34,64 +35,6 @@ interface SystemInstructionModalProps {
   currentTheme: string;
   selectedModelId: string;
 }
-
-const appThemes = [
-  {
-    id: 'velvet-rose',
-    name: 'Velvet Rose',
-    description: 'Moody and sophisticated workspace using deep, almost-black berry tones.',
-    colors: [
-      { name: 'Background', hex: '#0E0A0C' },
-      { name: 'Surface', hex: '#171114' },
-      { name: 'User Bubble', hex: '#3B222D' },
-      { name: 'Accent', hex: '#D98BA4' }
-    ]
-  },
-  {
-    id: 'midnight-lilac',
-    name: 'Midnight Lilac',
-    description: 'Cool and cyber-feminine leaning into deep purples and glowing lavenders.',
-    colors: [
-      { name: 'Background', hex: '#0A0910' },
-      { name: 'Surface', hex: '#12101C' },
-      { name: 'User Bubble', hex: '#2C254A' },
-      { name: 'Accent', hex: '#A682FF' }
-    ]
-  },
-  {
-    id: 'obsidian-gold',
-    name: 'Obsidian & Gold',
-    description: 'High-end glamour using an ultra-dark warm brown/black base with champagne.',
-    colors: [
-      { name: 'Background', hex: '#121111' },
-      { name: 'Surface', hex: '#1A1818' },
-      { name: 'User Bubble', hex: '#332B29' },
-      { name: 'Accent', hex: '#E3B5A4' }
-    ]
-  },
-  {
-    id: 'peach-glow',
-    name: 'Peach Glow',
-    description: 'Warm, sunny, and cozy workspace using rich terracotta bases and luscious peaches.',
-    colors: [
-      { name: 'Background', hex: '#150E0C' },
-      { name: 'Surface', hex: '#1E1512' },
-      { name: 'User Bubble', hex: '#45241C' },
-      { name: 'Accent', hex: '#FF9E79' }
-    ]
-  },
-  {
-    id: 'pixie-glitter',
-    name: 'Pixie Glitter',
-    description: 'Dreamy, sparkly pastel pink canvas that displays magical floating glitter following your cursor pointer.',
-    colors: [
-      { name: 'Gradient Violet', hex: '#c86fc9' },
-      { name: 'Gradient Pink', hex: '#f79ad3' },
-      { name: 'User Bubble', hex: '#f79ad3' },
-      { name: 'Accent Glow', hex: '#3d0a3f' }
-    ]
-  }
-];
 
 const personaPresets = [
   {
