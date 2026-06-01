@@ -7,6 +7,8 @@ import { ModelSelector, modelOptions } from './components/ModelSelector';
 import { SystemInstructionModal } from './components/SystemInstructionModal';
 import { RenderedMarkdown } from './components/RenderedMarkdown';
 import CookieBanner from './components/CookieBanner';
+import { useTTS } from './hooks/useTTS';
+import { useImageAttachments } from './hooks/useImageAttachments';
 import { enableTracking } from './lib/analytics';
 import { 
   Send, 
@@ -348,44 +350,10 @@ export default function App() {
     }
   };
 
-  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { pendingImages, setPendingImages, handleAddImages, handlePaste, removePendingImage } = useImageAttachments();
+  const { speakingMessageId, handleToggleSpeak } = useTTS();
 
-  const [pendingImages, setPendingImages] = useState<string[]>([]);
 
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (err) => reject(err);
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleAddImages = async (files: FileList | File[] | any) => {
-    const fileListArray = Array.from(files) as any[];
-    const imageFiles = fileListArray.filter((f) => f && f.type && f.type.startsWith('image/')) as File[];
-    if (imageFiles.length === 0) return;
-
-    const base64Promises = imageFiles.map((file) => fileToBase64(file));
-    try {
-      const base64s = await Promise.all(base64Promises);
-      setPendingImages((prev) => [...prev, ...base64s]);
-    } catch (err) {
-      console.error('Error reading image file:', err);
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    if (e.clipboardData.files && e.clipboardData.files.length > 0) {
-      const fileListArray = Array.from(e.clipboardData.files) as any[];
-      const imageFiles = fileListArray.filter((f) => f && f.type && f.type.startsWith('image/')) as File[];
-      if (imageFiles.length > 0) {
-        e.preventDefault();
-        handleAddImages(imageFiles);
-      }
-    }
-  };
 
   useEffect(() => {
     const initData = async () => {
@@ -830,81 +798,7 @@ export default function App() {
     }
   };
 
-  // Text to Speech Toggle Trigger
-  const handleToggleSpeak = async (messageId: string, text: string) => {
-    if (speakingMessageId === messageId) {
-      // Toggle off
-      setSpeakingMessageId(null);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      window.speechSynthesis.cancel();
-      return;
-    }
 
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    window.speechSynthesis.cancel();
-
-    setSpeakingMessageId(messageId);
-    
-    // Basic text filtering to avoid spelling code out loud during TTS
-    const speakableText = text.replace(/```[\s\S]*?```/g, '[Code snippet omitted from audio review]');
-
-    try {
-      // 1. Tell the frontend to hit your updated server.ts endpoint
-      const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text: speakableText })
-      });
-
-      if (!response.ok) throw new Error('TTS generation failed');
-
-      // 2. Play the audio that Python generated
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      
-      audioRef.current = audio;
-      
-      audio.onended = () => {
-        setSpeakingMessageId(null);
-        audioRef.current = null;
-      };
-
-      audio.play();
-
-    } catch (error) {
-      console.warn("External TTS server down, falling back to native browser TTS:", error);
-      
-      const utterance = new SpeechSynthesisUtterance(speakableText);
-      utterance.onend = () => {
-        setSpeakingMessageId(null);
-      };
-      utterance.onerror = () => {
-        setSpeakingMessageId(null);
-      };
-      
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
-  // Cancel any speech triggers on unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      window.speechSynthesis.cancel();
-    };
-  }, []);
 
 
   if (!isAppLoaded) {
@@ -1175,7 +1069,7 @@ export default function App() {
                         />
                         <button
                           type="button"
-                          onClick={() => setPendingImages((prev) => prev.filter((_, i) => i !== idx))}
+                          onClick={() => removePendingImage(idx)}
                           className="absolute -top-1 -right-1 p-1 bg-black/80 hover:bg-rose-950/90 text-[var(--theme-text-muted)] hover:text-rose-400 rounded-full transition cursor-pointer border border-[var(--theme-border)]"
                           title="Remove attached image"
                         >
