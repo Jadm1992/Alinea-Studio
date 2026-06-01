@@ -88,7 +88,7 @@ const MessageBubble = React.memo(({
               <button
                 onClick={() => handleToggleSpeak(message.id, message.text)}
                 className={`p-1 rounded transition cursor-pointer ${
-                  speakingMessageId === message.id ? 'text-amber-400' : 'text-[var(--theme-text-primary)]0 hover:text-[var(--theme-highlight)]'
+                  speakingMessageId === message.id ? 'text-amber-400' : 'text-[var(--theme-text-primary)] hover:text-[var(--theme-highlight)]'
                 }`}
                 title={speakingMessageId === message.id ? 'Stop Speech' : 'Listen with Speech TTS'}
               >
@@ -1200,7 +1200,7 @@ export default function App() {
                 <div className="flex-1 space-y-1">
                   <p className="text-xs font-semibold font-mono uppercase tracking-wider text-rose-300">API/Connection Error</p>
                   <p className="text-[12px] leading-relaxed text-[var(--theme-text-primary)] select-all">{errorBanner}</p>
-                  <p className="text-[10px] text-[var(--theme-text-primary)]0 leading-normal">
+                  <p className="text-[10px] text-[var(--theme-text-primary)] leading-normal">
                     Check your API key status or service configurations in <strong className="text-emerald-400">Settings &gt; Secrets</strong>. If running locally, please verify your local <code className="text-[var(--theme-text-muted)]">.env</code> configurations.
                   </p>
                 </div>
@@ -1322,8 +1322,8 @@ export default function App() {
                         title="Send Message"
                         className={`p-2 rounded-lg transition overflow-hidden cursor-pointer ${
                           (userInput.trim() || pendingImages.length > 0)
-                            ? 'bg-emerald-500 text-[var(--theme-bg)] hover:bg-emerald-400 active:scale-95 shadow-md shadow-emerald-505/10'
-                            : 'bg-[var(--theme-border)] text-[var(--theme-text-primary)]0 border border-[var(--theme-border)] cursor-not-allowed'
+                            ? 'bg-emerald-500 text-[var(--theme-bg)] hover:bg-emerald-400 active:scale-95 shadow-md shadow-emerald-500/10'
+                            : 'bg-[var(--theme-border)] text-[var(--theme-text-primary)] border border-[var(--theme-border)] cursor-not-allowed'
                         }`}
                       >
                         <Send className="w-4 h-4 ml-0.5" />

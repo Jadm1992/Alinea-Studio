@@ -318,7 +318,7 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
                       className="p-3 text-left rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] hover:border-[var(--theme-border)] hover:bg-[var(--theme-surface)]/85 transition"
                     >
                       <p className="text-xs font-semibold text-[var(--theme-text-primary)]">{preset.name}</p>
-                      <p className="text-[10px] text-[var(--theme-text-primary)]0 mt-1 line-clamp-2 leading-relaxed">{preset.description}</p>
+                      <p className="text-[10px] text-[var(--theme-text-primary)] mt-1 line-clamp-2 leading-relaxed">{preset.description}</p>
                     </button>
                   ))}
                 </div>
@@ -362,7 +362,7 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
                   }`}
                 />
                 
-                <p className="text-[10px] text-[var(--theme-text-primary)]0 font-mono tracking-wide">
+                <p className="text-[10px] text-[var(--theme-text-primary)] font-mono tracking-wide">
                   Current configuration bias: <span className="text-[var(--theme-text-primary)] font-semibold">{getTemperatureLabel(temperature)}</span>
                 </p>
               </div>
@@ -471,7 +471,7 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
                       <div key={prov.id} className="flex flex-col gap-1.5">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-semibold text-[var(--theme-text-primary)]">{prov.label}</span>
-                          <span className="text-[10px] text-[var(--theme-text-primary)]0 font-mono font-medium">
+                          <span className="text-[10px] text-[var(--theme-text-primary)] font-mono font-medium">
                             {apiKeys[prov.id] ? '✓ Configured locally' : 'No custom key configured'}
                           </span>
                         </div>
@@ -515,12 +515,12 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
                               <span className="font-semibold text-[var(--theme-text-primary)] leading-none truncate">{m.name}</span>
                               <span className="text-[8px] bg-emerald-950/60 border border-emerald-900 text-emerald-400 px-1 py-0.2 rounded shrink-0">{m.badge}</span>
                             </div>
-                            <p className="text-[10px] text-[var(--theme-text-primary)]0 font-mono mt-1 leading-none truncate">{m.id}</p>
+                            <p className="text-[10px] text-[var(--theme-text-primary)] font-mono mt-1 leading-none truncate">{m.id}</p>
                           </div>
                           <button
                             type="button"
                             onClick={() => handleDeleteModel(m.id)}
-                            className="p-1.5 text-[var(--theme-text-primary)]0 hover:text-rose-400 rounded hover:bg-[var(--theme-surface-hover)] transition cursor-pointer"
+                            className="p-1.5 text-[var(--theme-text-primary)] hover:text-rose-400 rounded hover:bg-[var(--theme-surface-hover)] transition cursor-pointer"
                             title="Delete custom model entry"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -531,7 +531,7 @@ export const SystemInstructionModal: React.FC<SystemInstructionModalProps> = ({
                   </div>
                 ) : (
                   <div className="border border-dashed border-[var(--theme-border)] rounded-xl p-6 text-center">
-                    <p className="text-xs text-[var(--theme-text-primary)]0">No custom models registered yet.</p>
+                    <p className="text-xs text-[var(--theme-text-primary)]">No custom models registered yet.</p>
                   </div>
                 )}
 

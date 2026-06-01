@@ -81,7 +81,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                 {model.id.includes('pro') || model.id.includes('claude') || model.id.includes('gpt-4') ? (
                   <Flame className={`w-4 h-4 mt-0.5 ${isSelected ? 'text-emerald-400' : 'text-[var(--theme-text-muted)]'}`} />
                 ) : (
-                  <Zap className={`w-4 h-4 mt-0.5 ${isSelected ? 'text-amber-400' : 'text-[var(--theme-text-primary)]0'}`} />
+                  <Zap className={`w-4 h-4 mt-0.5 ${isSelected ? 'text-amber-400' : 'text-[var(--theme-text-primary)]'}`} />
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
@@ -99,7 +99,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                     </span>
 
                   </div>
-                  <p className="text-[10px] text-[var(--theme-text-primary)]0 line-clamp-2 mt-0.5 leading-snug">
+                  <p className="text-[10px] text-[var(--theme-text-primary)] line-clamp-2 mt-0.5 leading-snug">
                     {model.description}
                   </p>
                 </div>

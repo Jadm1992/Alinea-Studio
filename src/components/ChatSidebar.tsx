@@ -155,7 +155,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                           e.stopPropagation();
                           onDeleteSession(session.id);
                         }}
-                        className="p-1 rounded hover:bg-[var(--theme-border)] text-[var(--theme-text-primary)]0 hover:text-rose-400 transition"
+                        className="p-1 rounded hover:bg-[var(--theme-border)] text-[var(--theme-text-primary)] hover:text-rose-400 transition"
                         title="Delete Thread"
                       >
                         <Trash2 className="w-3 h-3" />
