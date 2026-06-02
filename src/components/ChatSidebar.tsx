@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChatSession } from '../types';
-import { MessageSquare, Plus, Trash2, Edit3, Check, X, MessageSquareCode } from 'lucide-react';
+import { MessageSquare, Plus, Trash2, Edit3, Check, X, MessageSquareCode, Download } from 'lucide-react';
+import { exportSessionToMarkdown, triggerDownload } from '../utils/exportUtils';
 
 interface ChatSidebarProps {
   sessions: ChatSession[];
@@ -191,7 +192,22 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
       {/* Dock Controls for Workspace and Purge */}
       <div className="p-3 border-t space-y-2 transition-colors duration-300" style={{ borderColor: 'var(--theme-border)' }}>
         {sessions.length > 0 && (
-          <button
+          <>
+            <button
+              onClick={() => {
+                const active = sessions.find(s => s.id === activeSessionId);
+                if (active) {
+                  const content = exportSessionToMarkdown(active);
+                  triggerDownload(content, `${active.title.replace(/\s+/g, '_')}.md`);
+                }
+              }}
+              className="w-full h-9 flex items-center justify-center gap-1.5 rounded-lg transition text-xs font-medium border opacity-80 hover:opacity-100"
+              style={{ color: 'var(--theme-text-primary)', borderColor: 'var(--theme-border)', backgroundColor: 'var(--theme-surface)' }}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export Chat (.md)</span>
+            </button>
+            <button
             onClick={onClearAllSessions}
             className="w-full h-9 flex items-center justify-center gap-1.5 rounded-lg transition text-xs font-medium opacity-50 hover:opacity-100"
             style={{ color: 'var(--theme-text-primary)' }}
@@ -199,6 +215,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
             <Trash2 className="w-3.5 h-3.5" />
             <span>Purge All Message History</span>
           </button>
+          </>
         )}
       </div>
     </div>

@@ -123,8 +123,14 @@ export function resolveProviderDetails(
       throw new Error('Azure endpoint not configured. Set the AZURE_API_ENDPOINT environment variable.');
     }
     const apiPath = process.env.AZURE_API_PATH || '/chat/completions';
-    if (!endpoint.endsWith(apiPath)) {
-      endpoint = endpoint.replace(/\/$/, '') + apiPath;
+    if (!endpoint.includes(apiPath)) {
+      try {
+        const urlObj = new URL(endpoint);
+        urlObj.pathname = urlObj.pathname.replace(/\/$/, '') + apiPath;
+        endpoint = urlObj.toString();
+      } catch (e) {
+        endpoint = endpoint.replace(/\/$/, '') + apiPath;
+      }
     }
   } else {
     endpoint = config.defaultEndpoint;
