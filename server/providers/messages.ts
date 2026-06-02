@@ -4,9 +4,63 @@ import type {
   OpenAIContentBlock,
   AnthropicMessage,
   AnthropicContentBlock,
+  GeminiContent,
+  GeminiPart,
 } from './types';
 import { imagesToOpenAIContent, imagesToAnthropicContent } from './images';
+import { parseBase64Image } from './images';
 
+// ============================================================
+// Gemini Message Formatting
+// ============================================================
+
+/**
+ * Formats messages for the Gemini generative AI SDK.
+ * Converts history + current message into the Gemini contents array format.
+ * Ensures the first content entry has role 'user' (Gemini requirement).
+ */
+export function formatGeminiContents(
+  message: string,
+  images: string[],
+  history: HistoryMessage[]
+): GeminiContent[] {
+  const contents: GeminiContent[] = [];
+
+  if (history && Array.isArray(history)) {
+    for (const msg of history) {
+      const parts: GeminiPart[] = [];
+      if (msg.images && Array.isArray(msg.images)) {
+        for (const img of msg.images) {
+          const parsed = parseBase64Image(img);
+          if (parsed) {
+            parts.push({ inlineData: { mimeType: parsed.mediaType, data: parsed.data } });
+          }
+        }
+      }
+      parts.push({ text: msg.text || '' });
+      contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts });
+    }
+  }
+
+  // Gemini requires the first content to be from 'user'
+  while (contents.length > 0 && contents[0].role !== 'user') {
+    contents.shift();
+  }
+
+  const currentParts: GeminiPart[] = [];
+  if (images && Array.isArray(images)) {
+    for (const img of images) {
+      const parsed = parseBase64Image(img);
+      if (parsed) {
+        currentParts.push({ inlineData: { mimeType: parsed.mediaType, data: parsed.data } });
+      }
+    }
+  }
+  currentParts.push({ text: message || '' });
+  contents.push({ role: 'user', parts: currentParts });
+
+  return contents;
+}
 // ============================================================
 // OpenAI Message Formatting
 // ============================================================

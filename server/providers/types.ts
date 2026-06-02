@@ -62,6 +62,25 @@ export interface AnthropicMessage {
 }
 
 // ============================================================
+// Gemini Types
+// ============================================================
+
+export interface GeminiInlineData {
+  mimeType: string;
+  data: string;
+}
+
+export interface GeminiPart {
+  text?: string;
+  inlineData?: GeminiInlineData;
+}
+
+export interface GeminiContent {
+  role: 'user' | 'model';
+  parts: GeminiPart[];
+}
+
+// ============================================================
 // Image Parsing
 // ============================================================
 

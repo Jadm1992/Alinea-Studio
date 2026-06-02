@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getPrimaryClient, getProviderDetails, formatOpenAIMessages, formatAnthropicMessages } from "../providers";
+import { getPrimaryClient, getProviderDetails, formatOpenAIMessages, formatAnthropicMessages, formatGeminiContents } from "../providers";
 
 const router = Router();
 
@@ -16,32 +16,7 @@ router.post("/", async (req, res) => {
 
     if (provider === "gemini") {
       const ai = getPrimaryClient(apiKeys);
-      const contents = [];
-      if (history && Array.isArray(history)) {
-        for (const msg of history) {
-          const parts = [];
-          if (msg.images && Array.isArray(msg.images)) {
-            for (const img of msg.images) {
-              const match = img.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
-              if (match) parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-            }
-          }
-          parts.push({ text: msg.text || "" });
-          contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: parts });
-        }
-      }
-
-      while (contents.length > 0 && contents[0].role !== 'user') contents.shift();
-
-      const currentParts = [];
-      if (images && Array.isArray(images)) {
-        for (const img of images) {
-          const match = img.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
-          if (match) currentParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-        }
-      }
-      currentParts.push({ text: message || "" });
-      contents.push({ role: 'user', parts: currentParts });
+      const contents = formatGeminiContents(message || "", images || [], history || []);
 
       const response = await ai.models.generateContent({
         model: cleanModel,
@@ -76,7 +51,7 @@ router.post("/", async (req, res) => {
 
       if (!response.ok) throw new Error(`Anthropic error (${response.status}): ${await response.text()}`);
 
-      const parsed: any = await response.json();
+      const parsed = await response.json() as { content?: { text?: string }[] };
       res.json({ text: parsed.content?.[0]?.text || "" });
     } else {
       const oaiMessages = formatOpenAIMessages(message, images || [], history || [], systemInstruction);
@@ -98,12 +73,13 @@ router.post("/", async (req, res) => {
 
       if (!response.ok) throw new Error(`${provider.toUpperCase()} error (${response.status}): ${await response.text()}`);
 
-      const parsed: any = await response.json();
+      const parsed = await response.json() as { choices?: { message?: { content?: string } }[] };
       res.json({ text: parsed.choices?.[0]?.message?.content || "" });
     }
-  } catch (err: any) {
-    console.error("Error in /api/chat:", err);
-    const msg = err.message && err.message.includes("is not configured") ? err.message : "An error occurred while processing your request.";
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error("Error in /api/chat:", error);
+    const msg = error.message && error.message.includes("is not configured") ? error.message : "An error occurred while processing your request.";
     res.status(500).json({ error: msg });
   }
 });
@@ -128,32 +104,7 @@ router.post("/stream", async (req, res) => {
 
     if (provider === "gemini") {
       const ai = getPrimaryClient(apiKeys);
-      const contents = [];
-      if (history && Array.isArray(history)) {
-        for (const msg of history) {
-          const parts = [];
-          if (msg.images && Array.isArray(msg.images)) {
-            for (const img of msg.images) {
-              const match = img.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
-              if (match) parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-            }
-          }
-          parts.push({ text: msg.text || "" });
-          contents.push({ role: msg.role === 'user' ? 'user' : 'model', parts: parts });
-        }
-      }
-
-      while (contents.length > 0 && contents[0].role !== 'user') contents.shift();
-
-      const currentParts = [];
-      if (images && Array.isArray(images)) {
-        for (const img of images) {
-          const match = img.match(/^data:(image\/[a-zA-Z+.-]+);base64,(.+)$/);
-          if (match) currentParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-        }
-      }
-      currentParts.push({ text: message || "" });
-      contents.push({ role: 'user', parts: currentParts });
+      const contents = formatGeminiContents(message || "", images || [], history || []);
 
       const responseStream = await ai.models.generateContentStream({
         model: cleanModel,
@@ -170,14 +121,14 @@ router.post("/stream", async (req, res) => {
         }
       }
     } else {
-      let isAnthropic = provider === "anthropic";
-      let requestBody: any = {
+      const isAnthropic = provider === "anthropic";
+      const requestBody: Record<string, unknown> = {
         model: cleanModel,
         temperature: temperature !== undefined ? Number(temperature) : undefined,
         stream: true
       };
 
-      let headers: any = {
+      const headers: Record<string, string> = {
         "Content-Type": "application/json"
       };
 
@@ -257,10 +208,11 @@ router.post("/stream", async (req, res) => {
 
     res.end();
 
-  } catch (err: any) {
-    console.error("Error in /api/chat/stream:", err);
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error("Error in /api/chat/stream:", error);
     if (!res.headersSent) res.writeHead(500, { "Content-Type": "text/event-stream" });
-    const msg = err.message && err.message.includes("is not configured") ? err.message : "An error occurred while streaming your request.";
+    const msg = error.message && error.message.includes("is not configured") ? error.message : "An error occurred while streaming your request.";
     res.write(`data: ${JSON.stringify({ error: msg })}\n\n`);
     res.end();
   }
