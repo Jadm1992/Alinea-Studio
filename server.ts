@@ -42,7 +42,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use("/api/quote", quotesRouter);
 app.use("/api/quotes", quotesRouter);
-app.use("/api/chat/completions", chatRouter);
+app.use("/api/chat", chatRouter);
 app.use("/api/tts", ttsRouter);
 app.use("/api/generate-image", imageRouter);
 
