@@ -16,7 +16,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://*.posthog.com", "https://*.i.posthog.com", "https://www.googletagmanager.com"],
       "connect-src": ["'self'", "ws:", "wss:", "https:"],
       "media-src": ["'self'", "blob:"],
       "img-src": ["'self'", "data:", "blob:", "https:"],

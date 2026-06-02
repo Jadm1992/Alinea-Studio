@@ -80,7 +80,7 @@ router.post("/", async (req, res) => {
       res.json({ text: parsed.content?.[0]?.text || "" });
     } else {
       const oaiMessages = formatOpenAIMessages(message, images || [], history || [], systemInstruction);
-      const isAzureOpenAI = endpoint.includes("openai.azure.com");
+      const isAzureOpenAI = provider === "azure" || endpoint.includes("azure");
       
       const response = await fetch(endpoint, {
         method: "POST",
@@ -191,7 +191,7 @@ router.post("/stream", async (req, res) => {
       } else {
         const oaiMessages = formatOpenAIMessages(message, images || [], history || [], systemInstruction);
         requestBody.messages = oaiMessages;
-        if (endpoint.includes("openai.azure.com")) {
+        if (provider === "azure" || endpoint.includes("azure")) {
           headers["api-key"] = apiKey;
         } else {
           headers["Authorization"] = `Bearer ${apiKey}`;
