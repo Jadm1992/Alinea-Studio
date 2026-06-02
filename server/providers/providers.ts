@@ -41,7 +41,7 @@ export const PROVIDER_REGISTRY: Record<string, ProviderConfig> = {
     apiKeyEnvVar: 'AZURE_API_KEY',
     extractModel: (model) => {
       const clean = model.substring(6);
-      return clean === 'ai' ? (process.env.AZURE_MODEL_NAME || 'gpt-5.4-pro') : clean;
+      return clean === 'ai' ? (process.env.AZURE_MODEL_NAME || 'DeepSeek-V4-Pro') : clean;
     },
   },
   local: {

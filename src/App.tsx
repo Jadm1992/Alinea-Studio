@@ -8,6 +8,7 @@ import { SystemInstructionModal } from './components/SystemInstructionModal';
 import { RenderedMarkdown } from './components/RenderedMarkdown';
 import CookieBanner from './components/CookieBanner';
 import { useTTS } from './hooks/useTTS';
+import { useStreaming } from './hooks/useStreaming';
 import { useImageAttachments } from './hooks/useImageAttachments';
 import { enableTracking } from './lib/analytics';
 import { 
@@ -268,8 +269,6 @@ export default function App() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string>('');
   const [userInput, setUserInput] = useState('');
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [streamingText, setStreamingText] = useState('');
 
   const [selectedModel, setSelectedModel] = useState('azure/ai');
   const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -329,7 +328,6 @@ export default function App() {
     return id;
   };
 
-  const abortControllerRef = useRef<AbortController | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const [theme, setTheme] = useState<string>('midnight-lilac');
@@ -451,12 +449,30 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [sessions, streamingText, isStreaming]);
+  // useEffect moved below useStreaming hook
 
   const activeSession = sessions.find((s) => s.id === activeSessionId);
   const effectiveModel = activeSession?.model || selectedModel;
+
+  const {
+    isStreaming,
+    setIsStreaming,
+    streamingText,
+    setStreamingText,
+    abortControllerRef,
+    handleStopStreaming
+  } = useStreaming({
+    activeSession,
+    effectiveModel,
+    sessions,
+    setSessions,
+    setErrorBanner,
+    scrollToBottom,
+  });
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [sessions, streamingText, isStreaming]);
 
   const handleAddNewSession = () => {
     fetchRandomQuote();
@@ -563,31 +579,6 @@ export default function App() {
           s.id === activeSession.id ? { ...s, model: modelId } : s
         )
       );
-    }
-  };
-
-  const handleStopStreaming = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      setIsStreaming(false);
-
-      if (activeSession && streamingText.trim()) {
-        const fullStreamingMessage: Message = {
-          id: `msg-${Date.now()}-partial`,
-          role: 'assistant',
-          text: streamingText,
-          timestamp: getTimestamp(),
-          modelUsed: effectiveModel
-        };
-        setSessions(
-          sessions.map((s) =>
-            s.id === activeSession.id
-              ? { ...s, messages: [...s.messages, fullStreamingMessage] }
-              : s
-          )
-        );
-      }
-      setStreamingText('');
     }
   };
 
